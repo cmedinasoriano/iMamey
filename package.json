@@ -1,0 +1,40 @@
+{
+	"rnpm": {
+		"assets": [
+			"resources/fonts",
+			"resources/images"
+		]
+	},
+	"name": "iMamey",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"start": "node node_modules/react-native/local-cli/cli.js start",
+		"test": "jest"
+	},
+	"dependencies": {
+		"firebase": "^4.0.0",
+		"react": "16.0.0-alpha.6",
+		"react-native": "0.44.0",
+		"react-native-add-calendar-event": "^0.1.2",
+		"react-native-device-info": "^0.10.2",
+		"react-native-fcm": "^7.0.2",
+		"react-native-immersive": "^0.0.5",
+		"react-native-navigation": "^2.0.16",
+		"react-native-orientation": "yamill/react-native-orientation",
+		"react-native-safari-view": "^2.0.0",
+		"react-native-svg": "^5.1.8",
+		"react-native-swiper": "^1.5.4",
+		"react-native-vector-icons": "^4.1.1",
+		"react-navigation": "^1.0.0-beta.11"
+	},
+	"devDependencies": {
+		"babel-jest": "20.0.3",
+		"babel-preset-react-native": "1.9.2",
+		"jest": "20.0.3",
+		"react-test-renderer": "16.0.0-alpha.6"
+	},
+	"jest": {
+		"preset": "react-native"
+	}
+}

@@ -1,0 +1,15 @@
+Build Android App Realease:
+cd android
+./gradlew assembleRelease
+
+Test Release:
+react-native run-android --variant=release
+
+Known errors on build (Build Release and Test Release):
+- Execution failed for task ':app:processReleaseResources'.
+	- mdpi-v4 must be deleted to avoid this error while building.
+	- located in: /Users/cmedina/Documents/Developer/Apps/reactApps/iMamey/android/app/build/intermediates/res/merged/release/
+
+- Execution failed for task ':app:installRelease'.
+> com.android.builder.testing.api.DeviceException: com.android.ddmlib.InstallException: Failed to finalize session : INSTALL_FAILED_UPDATE_INCOMPATIBLE: Package com.goodhombres.iMamey signatures do not match the previously installed version; ignoring!
+	- Previously installed app must be deleted from device/emulator.
