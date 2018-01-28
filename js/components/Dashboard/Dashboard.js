@@ -34,8 +34,8 @@ import Firebase from 'firebase';
 import moment from 'moment';
 
 import { createIconSetFromIcoMoon } from 'react-native-vector-icons';
-import icoMoonConfig from '../../resources/fonts/selection.json';
-import ImageLoader from './ImageLoader';
+import icoMoonConfig from './../../../resources/fonts/selection.json';
+import ImageLoader from './../ImageLoader/ImageLoader';
 
 
 const Icon = createIconSetFromIcoMoon(icoMoonConfig);
@@ -208,7 +208,7 @@ export default class IMameyDashboardView extends Component {
           activeOpacity={1}
           >
           <View>
-            <ImageLoader source={{uri: rowData.icon }} loadingSource={require('../../resources/images/Picture.png')} style={[styles.icon, {display: 'flex'}]} />
+            <ImageLoader source={{uri: rowData.icon }} loadingSource={require('./../../../resources/images/Picture.png')} style={[styles.icon, {display: 'flex'}]} />
             <Text 
               style={[styles.h1, styles.text, styles.iconText, {textAlign: 'center',}, {color: ((Number(rowId)+alternateRow)%2 ? '#FC5185' : '#2794EB')}]}
             >{rowData.title}</Text>

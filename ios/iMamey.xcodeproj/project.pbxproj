@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -622,6 +623,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				B22924B2B66A4C5786C112B3 /* Resources */,
 				882CDE911EE35D950061AFBA /* Frameworks */,
+				880798F8200FA1A6004FBD50 /* Recovered References */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -636,6 +638,21 @@
 				2D02E4901E0B4A5D006451C7 /* iMamey-tvOSTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		880798F8200FA1A6004FBD50 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				6441798EE5354B42977D42C4 /* libRNDeviceInfo.a */,
+				B9E76F5F3D6946AA82D45492 /* libReactNativeNavigation.a */,
+				EBAA185F87DC4A86805588AF /* libSafariViewManager.a */,
+				CBFAF375E2034A3DA34FB600 /* libRNSVG.a */,
+				907EB2076CB0468FAC60AAD5 /* libRNVectorIcons.a */,
+				841CA71752714C08B3338A79 /* libRCTOrientation.a */,
+				FFAC54E2D160424AB43D05E5 /* libRNFIRMessaging.a */,
+				798D509D2E5C4D00BDA9BB4B /* libRNAddCalendarEvent.a */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 		882CDD721EE0E6CA0061AFBA /* Products */ = {

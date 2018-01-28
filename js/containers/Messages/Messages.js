@@ -345,7 +345,7 @@ export default class IMameyMessagesView extends Component {
           <StatusBar barStyle='light-content' />
 
           <Image
-            source={require('../../resources/images/mists.jpg')}
+            source={require('./../../../resources/images/mists.jpg')}
             style={[styles.navBar, { width: screenWidth, }]}>
             <Text style={[styles.navBarHeader, styles.text]}>Mensajes</Text>
           </Image>

@@ -27,21 +27,36 @@ export default class Day extends Component {
 
   dayCircleStyle = (isWeekend, isSelected, isToday, event) => {
     const { customStyle } = this.props;
-    const dayCircleStyle = [styles.dayCircleFiller, customStyle.dayCircleFiller];
+    const dayCircleStyle = [
+      styles.dayCircleFiller, 
+      customStyle.dayCircleFiller
+    ];
 
     if (isSelected) {
       if (isToday) {
-        dayCircleStyle.push(styles.currentDayCircle, customStyle.currentDayCircle);
+        dayCircleStyle.push(
+          styles.currentDayCircle, 
+          customStyle.currentDayCircle
+        );
       } else {
-        dayCircleStyle.push(styles.selectedDayCircle, customStyle.selectedDayCircle);
+        dayCircleStyle.push(
+          styles.selectedDayCircle, 
+          customStyle.selectedDayCircle
+        );
       }
     }
 
     if (event) {
       if (isSelected) {
-        dayCircleStyle.push(styles.hasEventDaySelectedCircle, customStyle.hasEventDaySelectedCircle, event.hasEventDaySelectedCircle);
+        dayCircleStyle.push(
+          styles.hasEventDaySelectedCircle, 
+          customStyle.hasEventDaySelectedCircle, 
+          event.hasEventDaySelectedCircle);
       } else {
-        dayCircleStyle.push(styles.hasEventCircle, customStyle.hasEventCircle, event.hasEventCircle);
+        dayCircleStyle.push(
+          styles.hasEventCircle, 
+          customStyle.hasEventCircle, 
+          event.hasEventCircle);
       }
     }
     return dayCircleStyle;

@@ -40,14 +40,14 @@ export const firebaseConfig = {
 };
 
 import { createIconSetFromIcoMoon } from 'react-native-vector-icons';
-import icoMoonConfig from '../../resources/fonts/selection.json';
+import icoMoonConfig from './../../../resources/fonts/selection.json';
 
-import IMameySlidesView from '../home/IMameySlidesView';
-import IMameyCalendarView from '../calendar/IMameyCalendarView';
-import IMameyMessagesView from '../messages/IMameyMessagesView';
-import IMameyNavigatorView from '../dashboard/IMameyNavigatorView';
+import Home from './../Home/Home';
+import Calendar from './../../components/Calendar/Calendar';
+import Messages from './../Messages/Messages';
+import DashboardNavigator from '../DashboardNavigator/DashboardNavigator';
 
-import NavigationBarAndroid from '../../custom_modules/NavigationBarAndroid';
+import NavigationBarAndroid from './../../../custom_modules/NavigationBarAndroid';
 
 
 const Icon = createIconSetFromIcoMoon(icoMoonConfig);
@@ -284,7 +284,7 @@ export default class IMameyTabsView extends Component {
     switch (this.state.currentTab) {
 
       case Tab.home:
-        return (<IMameySlidesView />);
+        return (<Home />);
 
       case Tab.blog:
         if (Platform.OS == 'ios') {
@@ -294,13 +294,13 @@ export default class IMameyTabsView extends Component {
         }
 
       case Tab.calendar:
-        return (<IMameyCalendarView />);
+        return (<Calendar />);
 
       case Tab.messages:
-        return (<IMameyMessagesView ref="MessagesView" parent={this} />);
+        return (<Messages ref="Messages" parent={this} />);
 
       case Tab.dashboard:
-        return (<IMameyNavigatorView />);
+        return (<DashboardNavigator />);
 
     }
 
@@ -312,19 +312,20 @@ export default class IMameyTabsView extends Component {
     return (
       <View style={styles.container}>
 
-        {this.renderContent()}
+        {
+          this.renderContent()
+        }
 
         <View style={styles.tabBar}>
 
-          <View style={styles.tabBarButton}>
-            <TouchableHighlight style={[styles.iconTextWrapper, {backgroundColor: 'transparent'}]} onPress={(event) => this.onTabPressed1()} underlayColor='transparent' >
-              <View style={{ height: '100%' }}>
-                <Icon name="im-icon-home" style={[styles.icon, this.state.currentTab == Tab.home ? styles.selected : null]} underlayColor='transparent' />
-                <Text style={[styles.iconText, this.state.currentTab == Tab.home ? styles.selected : null]}>Inicio</Text>
-              </View>
-            </TouchableHighlight>
-          </View>
-
+        <View style={styles.tabBarButton}>
+          <TouchableHighlight style={[styles.iconTextWrapper, {backgroundColor: 'transparent'}]} onPress={(event) => this.onTabPressed1()} underlayColor='transparent' >
+            <View style={{ height: '100%' }}>
+              <Icon name="im-icon-home" style={[styles.icon, this.state.currentTab == Tab.home ? styles.selected : null]} underlayColor='transparent' />
+              <Text style={[styles.iconText, this.state.currentTab == Tab.home ? styles.selected : null]}>Inicio</Text>
+            </View>
+          </TouchableHighlight>
+        </View>
           <View style={styles.tabBarButton}>
             <TouchableHighlight style={styles.iconTextWrapper} onPress={(event) => this.onTabPressed2()} underlayColor='transparent' >
               <View style={{ height: '100%' }}>
@@ -333,7 +334,7 @@ export default class IMameyTabsView extends Component {
               </View>
             </TouchableHighlight>
           </View>
-
+        
           <View style={styles.tabBarButton}>
             <TouchableHighlight style={styles.iconTextWrapper} onPress={(event) => this.onTabPressed3()} underlayColor='transparent' >
               <View style={{ height: '100%' }}>
@@ -342,23 +343,23 @@ export default class IMameyTabsView extends Component {
               </View>
             </TouchableHighlight>
           </View>
-
+        
           <View style={styles.tabBarButton}>
             <TouchableHighlight style={styles.iconTextWrapper} onPress={(event) => this.onTabPressed4()} underlayColor='transparent' >
               <View style={{ height: '100%' }}>
                 <Icon name="im-icon-chat" style={[styles.icon, this.state.currentTab == Tab.messages ? styles.selected : null]} />
                 <Text style={[styles.iconText, this.state.currentTab == Tab.messages ? styles.selected : null]}>Mensajes</Text>
-
+        
                 <View style={{ display: this.state.badgeVisible ? 'flex' : 'none', width: '100%', height: '100%', position: 'absolute', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                   <View style={{ borderRadius: 10, backgroundColor: '#2794EB', minWidth: 19, minHeight: 19, borderWidth: 1, borderColor: '#ffffff', left: 20, bottom: 12, flexDirection: 'column', justifyContent: 'center' }}>
                     <Text style={{ color: 'white', fontWeight: '500', fontSize: 12, textAlign: 'center', backgroundColor: 'transparent', paddingHorizontal: 4, bottom: 1 }}>!</Text>
                   </View>
                 </View>
-
+        
               </View>
             </TouchableHighlight>
           </View>
-
+        
           <View style={styles.tabBarButton}>
             <TouchableHighlight style={styles.iconTextWrapper} onPress={(event) => this.onTabPressed5()} underlayColor='transparent' >
               <View style={{ height: '100%' }}>
@@ -367,14 +368,16 @@ export default class IMameyTabsView extends Component {
               </View>
             </TouchableHighlight>
           </View>
-
+        
+        
         </View>
-
+        
       </View>
     );
   }
 }
-
+  /*
+*/
 
 const styles = StyleSheet.create({
   container: {

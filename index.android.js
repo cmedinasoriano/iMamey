@@ -7,6 +7,6 @@
 'use strict';
 
 const {AppRegistry} = require('react-native');
-import IMameyTabsView from './js/tabs/IMameyTabsView';
+import Tabs from './js/containers/Tabs/Tabs';
 
-AppRegistry.registerComponent('iMamey', () => IMameyTabsView);
+AppRegistry.registerComponent('iMamey', () => Tabs);

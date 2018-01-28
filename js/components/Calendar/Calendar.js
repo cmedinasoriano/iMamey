@@ -83,10 +83,6 @@ export default class IMameyCalendarView extends Component {
       eventDates: [],
     };
 
-    Object.keys(DeviceInfo).forEach(function (key, value) {
-      console.log(key + ': ' + DeviceInfo[key]());
-    });
-
     this.updateEvents();
   }
 
@@ -138,7 +134,7 @@ export default class IMameyCalendarView extends Component {
           console.warn('dismissed');
         }
       })
-      .catch((error: string) => {
+      .catch((error) => {
         // handle error such as when user rejected permissions 
         console.warn(error);
       });
@@ -307,7 +303,7 @@ export default class IMameyCalendarView extends Component {
         <StatusBar barStyle='light-content' />
 
         <Image
-          source={require('../../resources/images/mists.jpg')}
+          source={require('./../../../resources/images/mists.jpg')}
           style={[styles.navBar, { width: screenWidth }]}>
 
           <View
@@ -333,14 +329,14 @@ export default class IMameyCalendarView extends Component {
               onPress={(event) => this.refs.Calendar.onPrev()}
               underlayColor='transparent'
               style={{ flexDirection: 'row', alignItems: 'center', height: navBarHeight, paddingTop: Platform.OS == 'ios' ? 10 : 0 }} >
-              <Image style={[styles.navButton]} source={require('../../resources/images/LeftChevron.png')} />
+              <Image style={[styles.navButton]} source={require('./../../../resources/images/LeftChevron.png')} />
             </TouchableHighlight>
 
             <TouchableHighlight
               onPress={(event) => this.refs.Calendar.onNext()}
               underlayColor='transparent'
               style={{ flexDirection: 'row', alignItems: 'center', height: navBarHeight, paddingTop: Platform.OS == 'ios' ? 10 : 0 }} >
-              <Image style={[styles.navButton]} source={require('../../resources/images/RightChevron.png')} />
+              <Image style={[styles.navButton]} source={require('./../../../resources/images/RightChevron.png')} />
             </TouchableHighlight>
 
           </View>
@@ -348,16 +344,16 @@ export default class IMameyCalendarView extends Component {
         </Image>
 
         <Calendar
-          scrollEnabled              // False disables swiping. Default: False
-          showEventIndicators        // False hides event indicators. Default:False
+          scrollEnabled          
+          showEventIndicators        
 
-          currentMonth={this.state.date}   // Optional date to set the currently displayed month after initialization
-          customStyle={calendarStyle} // Customize any pre-defined styles
-          dayHeadings={this.dayNamesAbrev}               // Default: ['S', 'M', 'T', 'W', 'T', 'F', 'S']
-          eventDates={this.state.eventDates}       // Optional array of moment() parseable dates that will show an event indicator
+          currentMonth={this.state.date}   
+          customStyle={calendarStyle} 
+          dayHeadings={this.dayNamesAbrev}               
+          eventDates={this.state.eventDates}       
 
-          selectedDate={this.state.selectedDate.format('YYYYMMDD')} // Day to be selected
-          startDate={this.state.date}      // The first month that will display. Default: current month
+          selectedDate={this.state.selectedDate.format('YYYYMMDD')} 
+          startDate={this.state.date}
 
           today={this.state.today}          // Defaults to today
           weekStart={0} // Day on which week starts 0 - Sunday, 1 - Monday, 2 - Tuesday, etc, Default: 1

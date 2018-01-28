@@ -159,7 +159,7 @@ class RefreshIndicator extends Component {
             ]
           }]}>
             <Animated.Image
-              source={require('../../resources/images/notification_envelope_back.png')}
+              source={require('./../../../resources/images/notification_envelope_back.png')}
               style={[
                 styles.icon, {
                   transform: [
@@ -169,7 +169,7 @@ class RefreshIndicator extends Component {
 
             />
             <Animated.Image
-              source={require('../../resources/images/notification_letter.png')}
+              source={require('./../../../resources/images/notification_letter.png')}
               style={[
                 styles.icon, {
                   transform: [
@@ -178,7 +178,7 @@ class RefreshIndicator extends Component {
                 }]}
             />
             <Animated.Image
-              source={require('../../resources/images/notification_envelope_front.png')}
+              source={require('./../../../resources/images/notification_envelope_front.png')}
               style={[
                 styles.icon, {
                   transform: [
