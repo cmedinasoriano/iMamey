@@ -49,7 +49,7 @@ const dashboardItemSize = screenWidth/dashboardItemsPerRow-dashboardItemMargin*2
 
 const AnimatedZero = new Animated.Value(0);
 
-export default class IMameyDashboardView extends Component {
+export default class Dashboard extends Component {
 
   static navigationOptions = {
     title: 'Utilidades',
@@ -102,7 +102,7 @@ export default class IMameyDashboardView extends Component {
       // abandon promise if object was destroyed due to exiting tab while loading
       if(!this.refs || !this.refs.ListView) return;
 
-      IMameyDashboardView.dashboardItems = [];
+      this.dashboardItems = [];
       this.animatedValue = [];
       this.arr = [];
 
@@ -112,7 +112,7 @@ export default class IMameyDashboardView extends Component {
         let value = item.val();
 
         // Push new formatted item to list data array
-        IMameyDashboardView.dashboardItems.push({
+        this.dashboardItems.push({
           title: value.title,
           uri: value.uri,
           nav: value.nav,
@@ -121,7 +121,7 @@ export default class IMameyDashboardView extends Component {
       });
 
       // Push this static item to the list (not from server)
-      IMameyDashboardView.dashboardItems.push({
+      this.dashboardItems.push({
         title: 'Lecciones Bíblicas',
         uri: null,
         nav: 'Lessons',
@@ -129,13 +129,13 @@ export default class IMameyDashboardView extends Component {
       });
 
       // Sort items by title
-      IMameyDashboardView.dashboardItems.sort(function(a, b){ 
+      this.dashboardItems.sort(function(a, b){ 
         if(a.title < b.title) return -1;
         if(a.title > b.title) return 1;
         return 0;
       });
 
-      for(var i=0; i<IMameyDashboardView.dashboardItems.length; i++) {
+      for(var i=0; i<this.dashboardItems.length; i++) {
         this.arr.push(i);
         this.animatedValue[i] = new Animated.Value(0)
       }
@@ -143,79 +143,10 @@ export default class IMameyDashboardView extends Component {
       this.animate();
 
       this.setState({
-        dataSource: this.state.dataSource.cloneWithRows(IMameyDashboardView.dashboardItems)
+        dataSource: this.state.dataSource.cloneWithRows(this.dashboardItems)
       });
 
     }).catch((error) => console.log(error));
-  }
-
-  animate () {
-    
-    const animations = this.arr.map((index) => {
-      
-      return Animated.timing(
-        this.animatedValue[index],
-        {
-          toValue: 1,
-          duration: 500,
-          easing: Easing.out(Easing.cubic),
-        }
-      )
-    })
-    Animated.stagger(100, animations).start()
-  }
-
-  render() {
-    return(
-      <View style={styles.container} >
-        <StatusBar barStyle='default' />
-
-        <View style={styles.statusBar} ></View>
-
-        <ListView
-          enableEmptySections
-          scrollEnabled
-          dataSource={this.state.dataSource}
-          scrollEventThrottle={1}
-          renderRow={this.renderRow.bind(this)}
-          contentContainerStyle={styles.dashboard}
-          ref='ListView' />
-      </View>
-    );
-  }
-
-  renderRow(rowData, sectionId, rowId) {
-
-    const { navigate } = this.props.navigation;
-    // alternate color also per row (only for even rows) (red, blue : blue, red : red, blue ...)
-    const alternateRow = dashboardItemsPerRow%2 ? 0 : Math.floor(rowId/2);
-
-    var val = this.animatedValue[rowId];
-
-    return (
-      <Animated.View style={[styles.row, {opacity: val, transform: [{scale: val}]}]}>
-        <TouchableHighlight 
-          // key={rowId}
-          onPress={() => {
-            if(rowData.uri) {
-              this.openURL(rowData.uri, rowData);
-            } else {
-              navigate(rowData.nav, { title: rowData.title })
-            }
-          }}
-          style={[styles.row, {width: '100%', height: '100%',}]}
-          underlayColor='#f0f0f0'
-          activeOpacity={1}
-          >
-          <View>
-            <ImageLoader source={{uri: rowData.icon }} loadingSource={require('./../../../resources/images/Picture.png')} style={[styles.icon, {display: 'flex'}]} />
-            <Text 
-              style={[styles.h1, styles.text, styles.iconText, {textAlign: 'center',}, {color: ((Number(rowId)+alternateRow)%2 ? '#FC5185' : '#2794EB')}]}
-            >{rowData.title}</Text>
-          </View>
-        </TouchableHighlight>
-      </Animated.View>
-    );
   }
 
   openURL(url, navData) {
@@ -237,76 +168,75 @@ export default class IMameyDashboardView extends Component {
       navigate('WebView', { title: navData.title, url: url })
     }
   }
+
+  animate () {
+    
+    const animations = this.arr.map((index) => {
+      
+      return Animated.timing(
+        this.animatedValue[index],
+        {
+          toValue: 1,
+          duration: 500,
+          easing: Easing.out(Easing.cubic),
+        }
+      )
+    })
+    Animated.stagger(100, animations).start()
+  }
+
+  renderRow(rowData, sectionId, rowId) {
+
+    const { navigate } = this.props.navigation;
+    // alternate color also per row (only for even rows) (red, blue : blue, red : red, blue ...)
+    const alternateRow = dashboardItemsPerRow%2 ? 0 : Math.floor(rowId/2);
+
+    var val = this.animatedValue[rowId];
+
+    return (
+      <Animated.View style={[styles.row, {opacity: val, transform: [{scale: val}]}]}>
+        <TouchableHighlight 
+          onPress={() => {
+            if(rowData.uri) {
+              this.openURL(rowData.uri, rowData);
+            } else {
+              navigate(rowData.nav, { title: rowData.title })
+            }
+          }}
+          style={[styles.row, {width: '100%', height: '100%',}]}
+          underlayColor={'#f0f0f0'}
+          activeOpacity={1}
+          >
+          <View>
+            <ImageLoader source={{uri: rowData.icon }} 
+            loadingSource={require('./../../../resources/images/Picture.png')} 
+            style={[styles.icon, {display: 'flex'}]} />
+            <Text 
+              style={[styles.title, styles.text, {textAlign: 'center',}, {color: ((Number(rowId)+alternateRow)%2 ? '#FC5185' : '#2794EB')}]}
+            >{rowData.title}</Text>
+          </View>
+        </TouchableHighlight>
+      </Animated.View>
+    );
+  }
+
+  render() {
+    return(
+      <View style={styles.container} >
+        <StatusBar barStyle={'default'} />
+
+        <View style={styles.statusBar} ></View>
+
+        <ListView
+          enableEmptySections
+          scrollEnabled
+          dataSource={this.state.dataSource}
+          scrollEventThrottle={1}
+          renderRow={this.renderRow.bind(this)}
+          contentContainerStyle={styles.dashboard}
+          ref={'ListView'} />
+      </View>
+    );
+  }
 }
 
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-
-  wrapper: {
-    
-  },
-  text: {
-    fontFamily: 'HelveticaNeue-Light',
-  },
-  img: {
-    resizeMode: 'cover',
-    width: 'auto',
-    height: '100%',
-  },
-  pagination: {
-    bottom: 65,
-  },
-
-  dashboard: { 
-    flexDirection: 'row', 
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    paddingBottom: 50,
-  },
-  row: {
-    alignSelf: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
-
-    width: dashboardItemSize,
-    height: dashboardItemSize,
-    margin: dashboardItemMargin,
-    backgroundColor: '#fff',
-  },
-
-  h1: {
-    fontSize: 16,
-    fontStyle: 'normal',
-    fontWeight: '600',
-    lineHeight: 22,
-  },
-
-  icon: {
-    width: 80, 
-    height: 80,
-    alignSelf: 'center',
-    marginBottom: 0, 
-  },
-
-  iconText: {
-    
-  },
-
-  box: {
-    transform: [{scale: 1}],
-  },
-
-  statusBar: {
-    height: 20,
-    width: '100%',
-    backgroundColor: '#fff',
-    borderColor: '#CCCCCC99',
-    borderBottomWidth: 1,
-  },
-
-
-});

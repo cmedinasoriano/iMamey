@@ -1,10 +1,9 @@
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    // backgroundColor: '#D5DDDF',
   },
 
   text: {
@@ -28,49 +27,32 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
 
-  navBarButton: {
-    color: '#FFFFFF',
-    textAlign: 'center',
-    width: 64,
-  },
-
-  tabBar: {
-    height: 50,
-  },
-
-  tabBarButton: {
-    flex: 1,
-  },
-
   row: {
     padding: 6,
     marginBottom: 6,
     backgroundColor: '#fff',
   },
 
-  h1: {
+  title: {
     fontSize: 18,
     fontStyle: 'normal',
-    fontWeight: '400',
-    lineHeight: 18,
-    color: '#000',
+    fontWeight: '500',
+    color: '#333',
     margin: 4,
   },
 
-  h2: {
+  time: {
     fontSize: 14,
     fontStyle: 'normal',
     fontWeight: '400',
-    lineHeight: 18,
     color: '#666',
     margin: 4,
   },
 
-  p: {
+  content: {
     fontSize: 16,
     fontStyle: 'normal',
     fontWeight: '400',
-    lineHeight: 18,
     color: '#000',
     margin: 4,
   },
@@ -90,10 +72,14 @@ export const styles = StyleSheet.create({
     maxHeight: 70,
     minHeight: 0,
     width: '100%',
-    // justifyContent: 'space-between',
     flex: 0,
     flexDirection: 'column',
   },
 
+  messages: {
+    paddingBottom: 50,
+  },
   
 });
+
+export default styles;

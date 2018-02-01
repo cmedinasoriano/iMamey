@@ -77,7 +77,7 @@ export default class Lessons extends Component {
       <TouchableHighlight 
         key={rowId} 
         onPress={() => this.openURL(rowData.url, rowData)}
-        underlayColor='#f0f0f0'
+        underlayColor={'#f0f0f0'}
         style={[styles.row, (rowId != Object.keys(this.state.dataSource._dataBlob[sectionId]).length - 1) ? {} : { marginBottom: 0 }]}>
         <Text style={[styles.title, styles.text]}>{rowData.title}</Text>
       </TouchableHighlight>
@@ -117,7 +117,7 @@ export default class Lessons extends Component {
     return (
 
       <View style={styles.container} >
-        <StatusBar barStyle='default' />
+        <StatusBar barStyle={'default'} />
         
         <ListView
           enableEmptySections
@@ -126,7 +126,7 @@ export default class Lessons extends Component {
           scrollEnabled={this.state.canScroll}
           renderRow={this.renderRow.bind(this)}
           contentContainerStyle={styles.lessons}
-          ref='PTRListView' />
+          ref={'PTRListView'} />
       </View>
     );
   }

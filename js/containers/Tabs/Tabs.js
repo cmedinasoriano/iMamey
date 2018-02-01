@@ -319,15 +319,15 @@ export default class IMameyTabsView extends Component {
         <View style={styles.tabBar}>
 
         <View style={styles.tabBarButton}>
-          <TouchableHighlight style={[styles.iconTextWrapper, {backgroundColor: 'transparent'}]} onPress={(event) => this.onTabPressed1()} underlayColor='transparent' >
+          <TouchableHighlight style={[styles.iconTextWrapper, {backgroundColor: 'transparent'}]} onPress={(event) => this.onTabPressed1()} underlayColor={ 'transparent' } >
             <View style={{ height: '100%' }}>
-              <Icon name="im-icon-home" style={[styles.icon, this.state.currentTab == Tab.home ? styles.selected : null]} underlayColor='transparent' />
+              <Icon name="im-icon-home" style={[styles.icon, this.state.currentTab == Tab.home ? styles.selected : null]} underlayColor={ 'transparent' } />
               <Text style={[styles.iconText, this.state.currentTab == Tab.home ? styles.selected : null]}>Inicio</Text>
             </View>
           </TouchableHighlight>
         </View>
           <View style={styles.tabBarButton}>
-            <TouchableHighlight style={styles.iconTextWrapper} onPress={(event) => this.onTabPressed2()} underlayColor='transparent' >
+            <TouchableHighlight style={styles.iconTextWrapper} onPress={(event) => this.onTabPressed2()} underlayColor={ 'transparent' } >
               <View style={{ height: '100%' }}>
                 <Icon name="im-icon-book-open" style={[styles.icon, this.state.currentTab == Tab.blog ? styles.selected : null]} />
                 <Text style={[styles.iconText, this.state.currentTab == Tab.blog ? styles.selected : null]}>Blog</Text>
@@ -336,7 +336,7 @@ export default class IMameyTabsView extends Component {
           </View>
         
           <View style={styles.tabBarButton}>
-            <TouchableHighlight style={styles.iconTextWrapper} onPress={(event) => this.onTabPressed3()} underlayColor='transparent' >
+            <TouchableHighlight style={styles.iconTextWrapper} onPress={(event) => this.onTabPressed3()} underlayColor={ 'transparent' } >
               <View style={{ height: '100%' }}>
                 <Icon name="im-icon-calendar" style={[styles.icon, this.state.currentTab == Tab.calendar ? styles.selected : null]} />
                 <Text style={[styles.iconText, this.state.currentTab == Tab.calendar ? styles.selected : null]}>Calendario</Text>
@@ -345,7 +345,7 @@ export default class IMameyTabsView extends Component {
           </View>
         
           <View style={styles.tabBarButton}>
-            <TouchableHighlight style={styles.iconTextWrapper} onPress={(event) => this.onTabPressed4()} underlayColor='transparent' >
+            <TouchableHighlight style={styles.iconTextWrapper} onPress={(event) => this.onTabPressed4()} underlayColor={ 'transparent' } >
               <View style={{ height: '100%' }}>
                 <Icon name="im-icon-chat" style={[styles.icon, this.state.currentTab == Tab.messages ? styles.selected : null]} />
                 <Text style={[styles.iconText, this.state.currentTab == Tab.messages ? styles.selected : null]}>Mensajes</Text>
@@ -361,7 +361,7 @@ export default class IMameyTabsView extends Component {
           </View>
         
           <View style={styles.tabBarButton}>
-            <TouchableHighlight style={styles.iconTextWrapper} onPress={(event) => this.onTabPressed5()} underlayColor='transparent' >
+            <TouchableHighlight style={styles.iconTextWrapper} onPress={(event) => this.onTabPressed5()} underlayColor={ 'transparent' } >
               <View style={{ height: '100%' }}>
                 <Icon name="im-icon-dashboard" style={[styles.icon, this.state.currentTab == Tab.dashboard ? styles.selected : null]} />
                 <Text style={[styles.iconText, this.state.currentTab == Tab.dashboard ? styles.selected : null]}>Utilidades</Text>

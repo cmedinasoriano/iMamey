@@ -19,11 +19,11 @@ export default class ImageLoader extends Component {
 
     return (
       <View>
-        <Image ref='temp' 
+        <Image ref={'temp'} 
         source={loadingSource} 
         style={[style, loaded ? {display: 'none'} : null]} /> 
 
-        <Image ref='loader' 
+        <Image ref={'loader'} 
         source={ source } 
         style={[style, !loaded ? {position: 'absolute'} : null]} 
         onLoad={this.handleLoad} />

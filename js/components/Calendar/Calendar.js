@@ -6,15 +6,12 @@
 
 import React, { Component } from 'react';
 import {
-  AppRegistry,
-  Button,
   Image,
   ListView,
   Platform,
   StatusBar,
   StyleSheet,
   Text,
-  TouchableElement,
   TouchableHighlight,
   TouchableOpacity,
   View,
@@ -30,7 +27,6 @@ import Calendar from "./react-native-calendar";
 import * as AddCalendarEvent from 'react-native-add-calendar-event';
 
 const screenWidth = Dimensions.get('window').width;
-const screenHeight = Dimensions.get('window').height;
 
 const navBarHeight = 64;
 
@@ -300,7 +296,7 @@ export default class IMameyCalendarView extends Component {
     return (
 
       <View style={styles.container} onLayout={this._onLayout}>
-        <StatusBar barStyle='light-content' />
+        <StatusBar barStyle={'light-content'} />
 
         <Image
           source={require('./../../../resources/images/mists.jpg')}
@@ -312,7 +308,7 @@ export default class IMameyCalendarView extends Component {
 
             <TouchableHighlight
               onPress={(event) => this.onToday(event)}
-              underlayColor='transparent'
+              underlayColor={'transparent'}
               style={{ flexDirection: 'row', alignItems: 'center', height: navBarHeight, paddingTop: Platform.OS == 'ios' ? 10 : 0 }} >
               <Text style={[styles.navButton, styles.text, styles.navText]}>Ir a Hoy</Text>
             </TouchableHighlight>
@@ -320,21 +316,21 @@ export default class IMameyCalendarView extends Component {
             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', height: navBarHeight, paddingTop: Platform.OS == 'ios' ? 10 : 0 }} >
               <Text
                 style={[styles.navBarHeader, styles.text, styles.navText, { width: '100%' }]}
-                underlayColor='transparent' >
+                underlayColor={'transparent'} >
                 {month} {year}
               </Text>
             </View>
 
             <TouchableHighlight
               onPress={(event) => this.refs.Calendar.onPrev()}
-              underlayColor='transparent'
+              underlayColor={'transparent'}
               style={{ flexDirection: 'row', alignItems: 'center', height: navBarHeight, paddingTop: Platform.OS == 'ios' ? 10 : 0 }} >
               <Image style={[styles.navButton]} source={require('./../../../resources/images/LeftChevron.png')} />
             </TouchableHighlight>
 
             <TouchableHighlight
               onPress={(event) => this.refs.Calendar.onNext()}
-              underlayColor='transparent'
+              underlayColor={'transparent'}
               style={{ flexDirection: 'row', alignItems: 'center', height: navBarHeight, paddingTop: Platform.OS == 'ios' ? 10 : 0 }} >
               <Image style={[styles.navButton]} source={require('./../../../resources/images/RightChevron.png')} />
             </TouchableHighlight>
@@ -387,7 +383,7 @@ export default class IMameyCalendarView extends Component {
           scrollEnabled={this.state.canScroll}
           renderRow={this.renderRow.bind(this)}
           contentContainerStyle={styles.calendarList}
-          ref='PTRListView' />
+          ref={'PTRListView'} />
 
       </View>
     );
