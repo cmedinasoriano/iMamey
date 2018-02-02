@@ -9,62 +9,39 @@ import {
   Image
 } from 'react-native'
 import PropTypes from 'prop-types';
-
-import Svg, {
-  Rect,
-  Circle,
-  Path
-} from 'react-native-svg';
+import Svg, { Rect, Circle, Path } from 'react-native-svg';
+import { describeSVGArc, polarToCartesian } from './../../helper/helper';
 import styles from './styles';
-
-const { height, windowWidth } = Dimensions.get('window')
 
 AnimatedPath = Animated.createAnimatedComponent(Path);
 
 export default class RefreshIndicator extends Component {
+  static propTypes = {
+    refreshing: PropTypes.bool,
+    animationProgress: PropTypes.number,
+    animationMaxProgress: PropTypes.number
+  };
 
   state = {
-    height: this.props.height,
-    progress: 0,
+    progress: new Animated.Value(0),
     ratio: new Animated.Value(0),
     scrollRatio: new Animated.Value(0),
   };
 
-  images = {
-    envelopeBack: require('./../../../resources/images/notification_envelope_back.png'),
-    letter: require('./../../../resources/images/notification_letter.png'),
-    envelopeFront: require('./../../../resources/images/notification_envelope_front.png')
-  };
-
-  static propTypes = {
-    refreshing: PropTypes.bool,
-    progress: PropTypes.number,
-    height: PropTypes.number
-  };
-
-  polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-    var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
-
-    return {
-      x: centerX + (radius * Math.cos(angleInRadians)),
-      y: centerY + (radius * Math.sin(angleInRadians))
-    };
-  }
-
-  describeSVGArc(x, y, radius, startAngle, endAngle, pathWidth=1) {
-
-    const start = this.polarToCartesian(x, y, radius, endAngle);
-    const end = this.polarToCartesian(x, y, radius, startAngle);
-
-    const largeArcFlag = (endAngle - startAngle > 180) ? 1 : 0;
-
-    const w2 = pathWidth * 2;
-    return `M${start.x + w2 - .01} ${start.y + w2} A${radius} ${radius} 0 ${largeArcFlag} 0 ${end.x + w2} ${end.y + w2}`;
-  }
-
-  lerp(a, b, n) {
-    return (1 - n) * a + n * b;
-  }
+  images = [
+    {
+      icon: require('./../../../resources/images/notification_envelope_back.png'),
+      animationDirection: -1,
+    },
+    {
+      icon: require('./../../../resources/images/notification_letter.png'),
+      animationDirection: 1,
+    },
+    {
+      icon: require('./../../../resources/images/notification_envelope_front.png'),
+      animationDirection: -1,
+    },
+  ];
 
   backgroundAnimationStart() {
     this.bgAnimation = Animated.loop(Animated.timing(this.animatedValue, {
@@ -89,115 +66,128 @@ export default class RefreshIndicator extends Component {
 
   componentWillMount() {
     this.animatedValue = new Animated.Value(0);
-    this.progress = new Animated.Value(1);
-  }
-
-  componentDidMount() {
-
-    setInterval(() => {
-      if (this.state.progress != this.props.progress._value) {
-        this.setState({
-          progress: this.props.progress._value,
-        })
-      }
-    }, 1);
   }
 
   componentWillReceiveProps(nextProps) {
-
-    this.progress = new Animated.Value(nextProps.progress);
-    // this.state.ratio = new Animated.Value(nextProps.progress);
+    const { refreshing } = this.props;
+    const { nextRefreshing } = nextProps;
+    const progressRatio = nextProps.animationProgress / nextProps.animationMaxProgress;
 
     Animated.timing(this.state.scrollRatio, {
-      toValue: nextProps.progress,
-      easing: Easing.out(Easing.quad),
-      duration: 200,
+      toValue: progressRatio,
+      easing: Easing.out(Easing.ease),
+      duration: 300,
     }).start();
 
     Animated.timing(this.state.ratio, {
-      toValue: nextProps.progress,
+      toValue: progressRatio,
       easing: Easing.inOut(Easing.ease),
       duration: 200,
       delay: 50,
     }).start();
 
-    if (nextProps.refreshing && nextProps.refreshing !== this.props.refreshing) {
-      this.startRefreshing(nextProps.refreshing);
+    if (nextRefreshing && nextRefreshing !== refreshing) {
+      this.startRefreshing(nextRefreshing);
     }
   }
 
-  render() {
 
-    var color = this.animatedValue.interpolate({
+  /**
+   * renderAnimatedImages - Description
+   *
+   * @param {type} translateY Description
+   *
+   * @return {type} Description
+   */
+  renderAnimatedImages(translateY) {
+    const { envelopeBack, letter, envelopeFront } = this.images;
+
+    return this.images.map((image, index) => {
+      const direction = new Animated.Value(image.animationDirection);
+      const translate = Animated.multiply(translateY, direction);
+
+      return (
+        <Animated.Image
+          key={index}
+          source={image.icon}
+          style={[
+            styles.icon,
+            { transform: [{ translateY: translate }] },
+          ]}
+        />
+      );
+    })
+  }
+
+  render() {
+    const { animationProgress, animationMaxProgress } = this.props;
+    const { scrollRatio, ratio } = this.state;
+
+    const animatedColor = this.animatedValue.interpolate({
       inputRange: [0, .001, .33, .66, 1],
       outputRange: ['rgba(255, 255, 255, .0)', 'rgba(255, 255, 0, .2)', 'rgba(0, 255, 255, .2)', 'rgba(255, 0, 255, .2)', 'rgba(255, 255, 0, .2)']
     });
 
-    const progress = this.props.progress;
-    const ratio = (this.refreshing) ?
-      1 :
-      Math.max(0, Math.min(progress, 1));
-    const height = ratio * this.props.height;
-    const opacity = Math.max(0, Math.min(ratio * 2, 1));
-
-    const r = 17.5;
-    const lineW = 2;
-    const lineW2 = lineW * 2;
-
-    const min = this.props.height;
-
-    const refresherPosition = this.progress.interpolate({
-      inputRange: [0, min],
-      outputRange: [-min / 2, 0],
+    const animatedPosition = scrollRatio.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, animationMaxProgress / 2],
     });
 
-    const refresherHeight = this.progress.interpolate({
-      inputRange: [0, min],
-      outputRange: [-min, 0],
+    const animatedHeight = scrollRatio.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, animationMaxProgress],
     });
 
-    const translateUp = this.lerp(2, -6, ratio);
-
-    const animatedHeight = Animated.multiply(this.state.scrollRatio, new Animated.Value(this.props.height));
-
-    const animatedCentering = Animated.multiply(animatedHeight, new Animated.Value(0.5));
-
-    const animatedClockwiseRotation = this.state.scrollRatio.interpolate({
+    const animatedClockwiseRotation = scrollRatio.interpolate({
       inputRange: [0, 1],
       outputRange: ['-90deg', '0deg'],
       extrapolate: 'clamp',
     });
 
-    let dRange = [];
+    const animatedTranslate = ratio.interpolate({
+      inputRange: [0, 1],
+      outputRange: [2, -6],
+      extrapolate: 'clamp',
+    });
+
+    const animatedOpacity = ratio.interpolate({
+      inputRange: [0, .5],
+      outputRange: [0, 1],
+      extrapolate: 'clamp',
+    });
+
+
+    const r = 17.5;
+    const lineW = 2;
+    const lineW2 = lineW * 2;
+    const steps = 80;
+
     let iRange = [];
-    let steps = 100;
-    for (var i = 0; i<steps; i++){
-        const ratio = i/(steps-1);
-        dRange.push(this.describeSVGArc(r, r, r, 0, ratio*360, lineW));
-        iRange.push(ratio);
+    let dRange = [];
+
+    for (let i = 0; i < steps; i++){
+      const ratio = i/(steps-1);
+      iRange.push(ratio);
+      dRange.push(describeSVGArc(r, r, r, 0, ratio*360, lineW));
     }
 
-    var animatedPath = this.state.ratio.interpolate({
-        inputRange: iRange,
-        outputRange: dRange,
-        extrapolate: 'clamp',
-    })
-    
+    const animatedPath = ratio.interpolate({
+      inputRange: iRange,
+      outputRange: dRange,
+      extrapolate: 'clamp',
+    });
 
     return (
-
       <Animated.View style={[styles.background, {
-        backgroundColor: color,
+        backgroundColor: animatedColor,
         height: animatedHeight,
       }]}>
-
         <Animated.View style={[{
           backgroundColor: `red`,
           width: 0,
-          opacity: opacity,
+          opacity: animatedOpacity,
           transform: [
-            { translateY: animatedCentering },
-            { scale: 1 }
+            { translateY: animatedPosition }
           ]
         }]} >
           <Svg height={'50'} width={'50'} style={{
@@ -224,41 +214,10 @@ export default class RefreshIndicator extends Component {
             }
             ]}
           >
-
-            <Animated.Image
-              source={this.images.envelopeBack}
-              style={[
-                styles.icon, {
-                  transform: [
-                    { translateY: -translateUp },
-                  ]
-                }]}
-
-            />
-            <Animated.Image
-              source={this.images.letter}
-              style={[
-                styles.icon, {
-                  transform: [
-                    { translateY: translateUp },
-                  ]
-                }]}
-            />
-            <Animated.Image
-              source={this.images.envelopeFront}
-              style={[
-                styles.icon, {
-                  transform: [
-                    { translateY: -translateUp },
-                  ]
-                }]}
-            />
-
+            { this.renderAnimatedImages(animatedTranslate) }
           </Animated.View>
         </Animated.View>
-
       </Animated.View>
-
     );
   }
 }

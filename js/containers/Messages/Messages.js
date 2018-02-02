@@ -1,25 +1,18 @@
 /**
  * iMamey
- * 
+ *
  * @flow
  */
-
-'use strict';
 
 import React, { Component } from 'react';
 import {
   Animated,
-  AppRegistry,
-  Easing,
   Image,
   ListView,
   Platform,
   RefreshControl,
   StatusBar,
-  StyleSheet,
   Text,
-  TextInput,
-  TouchableHighlight,
   View,
 } from 'react-native';
 
@@ -35,23 +28,16 @@ import FCM, {
 
 import Firebase from 'firebase';
 
-import RefreshIndicator from './../../components/RefreshIndicator/RefreshIndicator'
+import RefreshIndicator from './../../components/RefreshIndicator/RefreshIndicator';
+
 import styles from './styles';
 
 const screenWidth = Dimensions.get('window').width;
-
 export const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 export const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-
-const MIN_PULLDOWN_DISTANCE = 120;
+const MIN_PULLDOWN_DISTANCE = 80;
 
 export default class Messages extends Component {
-  refreshing = false;
-  refresherHeight = 0;
-  readyToRefresh = false;
-  hiding = false;
-  lastNotificationTimestamp = 0;
-  refresherTimeout = null;
 
   constructor(props) {
     super(props);
@@ -60,15 +46,27 @@ export default class Messages extends Component {
       dataSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
       canScroll: true,
       refreshing: false,
-      scrollY: new Animated.Value(0),
-      progress: new Animated.Value(0),
+      lastNotificationTimestamp: 0,
+      scrollY: 0,
     };
 
-    this.items = [];
+    // Animated value for ListView's vertical scroll position 
+    this.scrollY = new Animated.Value(0);
 
-    if (!this.database) {
-      this.database = Firebase.database();
-    }
+    // Animated event to bind scroll position to state.scrollY
+    this.event = Animated.event(
+      [{ nativeEvent: {
+        contentOffset: { y: this.scrollY }
+      }}]
+    );
+
+    // Singleton firebase
+    this.database = this.database || Firebase.database();
+
+    // Bind doRefresh function
+    this.doRefresh = this.doRefresh.bind(this);
+    this.renderRow = this.renderRow.bind(this);
+    this.handleRelease = this.handleRelease.bind(this);
   }
 
   componentWillMount() {
@@ -77,61 +75,84 @@ export default class Messages extends Component {
   }
 
   componentDidMount() {
-    this.doRefresh();
-    this.state.scrollY.addListener((value) => {
+
+    this.scrollY.addListener((value) => {
       this.handleScroll(value);
     });
+
+    this.doRefresh();
   }
 
   componentWillUnmount() {
-    this.state.scrollY.removeAllListeners()
+    this.scrollY.removeAllListeners()
     clearTimeout(this.refresherTimeout);
   }
 
   handleRelease() {
-    if (this.state.scrollY._value <= MIN_PULLDOWN_DISTANCE) {
+    if (this.state.scrollY >= MIN_PULLDOWN_DISTANCE) {
       this.doRefresh();
     }
-    return this.setState({ readyToRefresh: false });
-  }
-  
-  handleScroll(pullDownDistance) {
-    var height = Math.max(0, -pullDownDistance.value);
-    
-    this.setState({ refresherHeight: height });
   }
 
-  lockScroll() {
-    this.setState({ canScroll: false });
+  handleScroll(scrollY) {
+    this.setState({
+      scrollY: Math.max(0, -scrollY.value),
+    });
   }
 
-  unlockScroll() {
-    this.setState({ canScroll: true });
-  }
-
+  /**
+   * showRefresher - Updates state to show refresher
+   *
+   */
   showRefresher() {
-    // this.setState({ refreshing: true });
-    this.refreshing = true;
-
-    if(Platform.OS == 'ios') {
-      this.setState({ refreshing: true, scrollTo: MIN_PULLDOWN_DISTANCE + 40 });
-      this.lockScroll();
+    // If iOS
+    if(Platform.OS === 'ios') {
+      this.refs.ListViewRef.scrollTo({ y: -MIN_PULLDOWN_DISTANCE });
+      // Set state to refreshing and scroll down
+      this.setState({ refreshing: true, canScroll: false });
+    } else {
+      // Set state to refreshing
+      this.setState({ refreshing: true });
     }
   }
 
+  /**
+   * hideRefresher - Updates refresh state to hide refresher
+   *
+   */
   hideRefresher() {
-    this.refreshing = false;
-    this.setState({ refreshing: false, hiding: false });
+    // Clear refresherTimeout
+    clearTimeout(this.refresherTimeout);
 
-    if(Platform.OS == 'ios') {
-      //this.refs.PTRListView.scrollTo({ y: 0 });
-      //this.refs.RefresherView.backgroundAnimationStop();
-      this.setState({ refreshing: false, scrollTo: 0 });
-      this.unlockScroll();
+    // If iOS
+    if (Platform.OS === 'ios') {
+      this.refs.ListViewRef.scrollTo({ y: 0 });
+      // Update state with new refresh state and enable scroll
+      this.setState({ refreshing: false, canScroll: true });
+    } else {
+      // Otherwise update state with new refresh state
+      this.setState({ refreshing: false });
     }
   }
 
+
+  /**
+   * clearRefresher - Hides the refresher
+   *
+   * @param {String} Message
+   */
+  clearRefresher(message) {
+    // TODO: Show Toasters with message
+    // Hide refresher
+    this.hideRefresher();
+  }
+
+  /**
+   * doRefresh - Check new messages and show refresher
+   *
+   */
   doRefresh() {
+    // Shows refresher
     this.showRefresher();
 
     // Set timeout for refresher
@@ -139,76 +160,101 @@ export default class Messages extends Component {
       this.hideRefresher();
 
       // TODO: Show Toaster timeout message here
-      
+
     }, 10000);
 
-    // Reference to database snapshots for last message info
-    this.itemsRef = this.database
-      .ref('notifications/snapshots/news')
+    // Check and retrieve new messages
+    this.checkForNewMessages();
+  }
 
-    // Query database for last notification timestamp
-    this.itemsRef.once('value', dataSnapshot => {
-      // abandon promise if object was destroyed due to exiting tab while loading
-      if(!this.refs || !this.refs.PTRListView) return;
+  /**
+   * checkForNewMessages - Checks and retrieves new messages
+   *
+   */
+  async checkForNewMessages() {
+    const ref = this.database.ref('notifications/snapshots/news');
+    const { hideMessageBadge } = this.props.parent;
+    const { lastNotificationTimestamp } = this.state;
 
+    try {
+      const snapshot = await ref.once('value');
       // Get result value
-      const value = dataSnapshot.val();
-
+      const value = snapshot.val();
       // Store last notification timestamp from server, if not registered store default value
-      const lastTimestamp = value.timestamp ? value.timestamp : 0;
+      const lastTimestamp = value.timestamp || 0;
 
-      // If last notification timestamp locally is older than server's
-      if (this.lastNotificationTimestamp < lastTimestamp) {
-        // Store latest timestamp from server
-        this.lastNotificationTimestamp = lastTimestamp;
-        
-        // Reference to database messages
-        this.itemsRef = this.database
-          .ref('notifications/messages/news')
-          .limitToLast(1000)
-          .orderByChild('timestamp');
+      // If the last notification's timestamp is after our
+      // stored notification timestamp (There are new messages)
+      if (lastNotificationTimestamp < lastTimestamp) {
+        // Get new messages with a limit specified
+        this.getMessages(100);
 
-        // Query database for all messages at once (for iteration)
-        this.itemsRef.once('value', dataSnapshot => {
-
-          // abandon promise if object was destroyed due to exiting tab while loading
-          if(!this.refs || !this.refs.PTRListView) return;
-
-          // Clear items array before filling it again
-          this.items = [];
-
-          // Iterate through all message items, format and add to list
-          dataSnapshot.forEach(item => {
-            // Get item value
-            const value = item.val();
-
-            // Push new formatted item to list data array
-            this.items.unshift({
-              id: value.key,
-              time: this.getTime(value.timestamp),
-              date: this.getDate(value.timestamp),
-              title: value.title,
-              text: value.message
-            });
-          });
-
-          // Refresh state's dataSource after all items were added
-          this.setState({
-            dataSource: this.state.dataSource.cloneWithRows(this.items)
-          });
-
-          this.hideRefresher();
-          clearTimeout(this.refresherTimeout);
-
-        });
+        // Update lastNotificationTimestamp
+        this.setState({ lastNotificationTimestamp: lastTimestamp });
       } else {
-        this.hideRefresher();
-        clearTimeout(this.refresherTimeout);
-        // TODO: Show Toaster nothing to update message here
+        // Clear refresher
+        this.clearRefresher('No new messages found.');
       }
-      
-      this.props.parent.hideMessageBadge();
-    });
+      // Hide message badge
+      hideMessageBadge();
+    } catch (e) {
+      // Print error message
+      console.log(e);
+      // Clear refresher and send error message
+      this.clearRefresher(e.message);
+    }
+  }
+
+
+  /**
+   * getMessages - Retrieves messages from database
+   *
+   * @param {Number} messageLimit Limit of maximum downloaded messages from database
+   *
+   */
+  async getMessages(messageLimit) {
+    // TODO: Database
+    // Add child of reversedTimestamp with value of negative timestamp
+    // Change orderByChild to be reversedTimestamp
+    // Change reduce function below to map
+
+    // Reference to database messages
+    const ref = this.database
+      .ref('notifications/messages/news')
+      .orderByChild('timestamp')
+      .limitToLast(messageLimit);
+
+    try {
+      // Get messages from database
+      const dataSnapshot = await ref.once('value');
+
+      // Holds messages
+      let messages = [];
+
+      // For each message object
+      dataSnapshot.forEach(snapshot => {
+        // Get snapshot value
+        const item = snapshot.val();
+
+        const message = {
+          id: snapshot.key,
+          time: this.getTime(item.timestamp),
+          date: this.getDate(item.timestamp),
+          title: item.title,
+          text: item.message,
+        };
+
+        messages = [message, ...messages];
+      });
+
+      // Refresh state's dataSource after all messages were retrieved
+      this.setState({ dataSource: this.state.dataSource.cloneWithRows(messages)});
+
+      // Hide refresher
+      this.hideRefresher();
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   getTime(timestamp) {
@@ -241,6 +287,16 @@ export default class Messages extends Component {
     return formattedDate;
   }
 
+
+  /**
+   * renderRow - Render messages as rows
+   *
+   * @param {Object} rowData
+   * @param {Number} sectionId
+   * @param {Number} rowId 
+   *
+   * @return {View}
+   */
   renderRow(rowData, sectionId, rowId) {
     return (
       <View key={rowId} style={[styles.row, (rowId != Object.keys(this.state.dataSource._dataBlob[sectionId]).length - 1) ? {} : {marginBottom: 0}]}>
@@ -253,60 +309,50 @@ export default class Messages extends Component {
 
   render() {
 
-    const event = Animated.event([
-      {
-        nativeEvent: {
-          contentOffset: {
-            y: this.state.scrollY
-          }
-        }
-      }
-    ]);
+    const { refreshing, canScroll, dataSource, scrollY } = this.state;
 
+    // Custom Refresh Indicator for iOS
     const refreshIndicator = (
-      Platform.OS == 'ios' ? 
-        <View style={styles.fillParent}>
-          <RefreshIndicator
-            refreshing={this.state.refreshing}
-            progress={-this.state.scrollY._value / MIN_PULLDOWN_DISTANCE}
-            height={MIN_PULLDOWN_DISTANCE}
-          />
-        </View>
-        : null
+      <View style={styles.fillParent}>
+        <RefreshIndicator
+          refreshing={refreshing}
+          animationProgress={scrollY}
+          animationMaxProgress={MIN_PULLDOWN_DISTANCE}
+        />
+      </View>
     );
 
-    const refreshControl = (
-      Platform.OS == 'ios' ? 
-        null : 
-        <RefreshControl refreshing={this.refreshing} onRefresh={() => this.doRefresh()} />
-    );
+    // Refresh control for Android
+    const refreshControl = <RefreshControl refreshing={refreshing} onRefresh={this.doRefresh} />;
+
+    // Check if device is iOS
+    const isIOS = Platform.OS === 'ios';
 
     return (
 
-        <View style={styles.container} onLayout={this._onLayout}>
+      <View style={styles.container} >
+        <StatusBar barStyle={'light-content'} />
+        <Image
+          source={require('./../../../resources/images/mists.jpg')}
+          style={[styles.navBar, { width: screenWidth }]}
+        >
+          <Text style={[styles.navBarHeader, styles.text]}>Mensajes</Text>
+        </Image>
 
-          <StatusBar barStyle={'light-content'} />
-          <Image
-            source={require('./../../../resources/images/mists.jpg')}
-            style={[styles.navBar, { width: screenWidth }]}>
-            <Text style={[styles.navBarHeader, styles.text]}>Mensajes</Text>
-          </Image>
-      
-          { refreshIndicator }
+        { (isIOS) && refreshIndicator }
 
-          <ListView
-            dataSource={this.state.dataSource}
-            scrollEventThrottle={100}
-            scrollEnabled={this.state.canScroll}
-            onScroll={event}
-            renderRow={this.renderRow.bind(this)}
-            onResponderRelease={this.handleRelease.bind(this)}
-      
-            contentContainerStyle={[styles.messages]}
-            refreshControl={refreshControl}
-             />
-             
-          </View>
-        );
-      }
-    }
+        <ListView
+          onScroll={this.event}
+          dataSource={dataSource}
+          scrollEventThrottle={100}
+          scrollEnabled={canScroll}
+          refreshControl={(isIOS) ? null : refreshControl}
+          renderRow={this.renderRow}
+          contentContainerStyle={[styles.messages]}
+          onResponderRelease={this.handleRelease}
+          ref='ListViewRef'
+        />
+      </View>
+    );
+  }
+}
